@@ -397,6 +397,8 @@ def _expand_cache_keys(item):
         return result
     elif value is None:
         return []
+    elif not isinstance(value, basestring):
+        return []
     else:
         return [value]
 
