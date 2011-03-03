@@ -142,7 +142,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 s.save()
                 logging.getLogger(__name__).info("Created subscription %s." % s.url_id)
             else:
-                s.delete()
+                obj.delete()
                 logging.getLogger(__name__).warning("Subscription failed.")
     
 admin.site.register(Subscription, SubscriptionAdmin)
