@@ -30,9 +30,20 @@
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 
+import random
+from django.conf import settings
+from urlparse import urlparse, urlunsplit
+from django.core.urlresolvers import reverse
+
 import urllib
 from oauth import oauth
 
+import typepad
+
+from pprint import pprint
+
+import logging
+log = logging.getLogger(__name__)
 
 class Token(models.Model, oauth.OAuthToken):
     """ Local database storage for user
@@ -95,6 +106,24 @@ class Subscription(models.Model):
 
     def __unicode__(self):
         return self.name or self.url_id
+
+    # def feed_data(self):
+    #         fd = []
+    #         feeds = self.feeds.split("\n")
+    #         for f in feeds:
+    #             pprint (f)
+    #             bits = f.split(':')
+    #             pprint (bits)
+    #             feed_parts = { 'source': bits[0], 'term': bits[1] }
+    #             fd.append(feed_parts)
+    #         return fd
+    #     
+    #     def filter_data(self):
+    #         fd = []
+    #         filters = self.filters.split("\n")
+    #         for f in filters:
+    #             fd.append(f)
+    #         return fd
 
     class Meta:
         app_label = 'typepadapp'
