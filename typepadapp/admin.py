@@ -72,6 +72,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         else:
             log.debug('WILL: create subscription in typepad')
         
+        obj.save()
         ###
         # setup for pushing to typepad
         for setting in ('OAUTH_CONSUMER_KEY', 'OAUTH_CONSUMER_SECRET', 'OAUTH_GENERAL_PURPOSE_KEY',
@@ -116,6 +117,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         
         # generate a verification token
         verify_token = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
+        
         if (not change):
             # new object
             # save to typepad
