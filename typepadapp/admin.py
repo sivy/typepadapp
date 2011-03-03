@@ -47,6 +47,8 @@ from pprint import pprint
 import logging
 log = logging.getLogger(__name__)
 
+from django.contrib.sites.models import Site
+
 class SubscriptionAdmin(admin.ModelAdmin):
 
     model = Subscription
