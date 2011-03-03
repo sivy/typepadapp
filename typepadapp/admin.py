@@ -33,6 +33,8 @@ from typepadapp.models.auth import Token
 from typepadapp.models.feedsub import Subscription
 
 import random
+from string import ascii_letters, digits
+
 from django.conf import settings
 from urlparse import urlparse, urlunsplit
 from django.core.urlresolvers import reverse
