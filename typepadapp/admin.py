@@ -122,7 +122,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
             # new object
             # save to typepad
             try:
-                callback_path = reverse('typepadapp.views.feedsub.callback', kwargs={'sub_id': str(s.id)})
+                callback_path = reverse('typepadapp.views.feedsub.callback', kwargs={'sub_id': str(obj.id)})
                 callback_url = urlunsplit(('http', domain, callback_path, '', ''))
 
                 application = typepad.Application.get_by_id(settings.APPLICATION_ID)
