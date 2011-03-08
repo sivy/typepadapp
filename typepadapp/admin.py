@@ -132,7 +132,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 
                 log.debug(callback_url)
                 
+                typepad.client.batch_request()
                 application = typepad.Application.get_by_id(settings.APPLICATION_ID)
+                typepad.client.complete_batch()
+                
                 resp = application.create_external_feed_subscription(
                     callback_url=callback_url,
                     feed_idents=feed_idents,
