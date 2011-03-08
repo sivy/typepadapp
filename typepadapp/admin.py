@@ -100,6 +100,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         token = oauth.OAuthToken(settings.OAUTH_GENERAL_PURPOSE_KEY, settings.OAUTH_GENERAL_PURPOSE_SECRET)
         backend = urlparse(typepad.client.endpoint)
         log.info(typepad.client.endpoint)
+        log.info(typepad.__file__)
         typepad.client.add_credentials(consumer, token, domain=backend[1])
         
         # collect data for sync to typepad
