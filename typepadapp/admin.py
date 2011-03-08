@@ -132,6 +132,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 
                 log.debug(callback_url)
                 
+                log.debug('save_model endpoint: %s' % typepad.client.endpoint)
                 typepad.client.batch_request()
                 application = typepad.Application.get_by_id(settings.APPLICATION_ID)
                 typepad.client.complete_batch()
