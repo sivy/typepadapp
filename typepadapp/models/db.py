@@ -94,36 +94,18 @@ class Subscription(models.Model):
 
     """
     name = models.CharField(max_length=200)
-    url_id = models.CharField(max_length=200, verbose_name='URL ID')
+    url_id = models.CharField(max_length=200, blank=True, verbose_name='URL ID')
     feeds = models.TextField(help_text='The feed identifiers associated with this subscription, one per line')
     filters = models.TextField(blank=True, help_text='The filters associated with this subscription, one per line')
     secret = models.CharField(max_length=200, blank=True)
     verified = models.BooleanField(help_text='Whether TypePad verified this subscription yet')
-    verify_token = models.CharField(max_length=200)
+    verify_token = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.name or self.url_id
 
     def __unicode__(self):
         return self.name or self.url_id
-
-    # def feed_data(self):
-    #         fd = []
-    #         feeds = self.feeds.split("\n")
-    #         for f in feeds:
-    #             pprint (f)
-    #             bits = f.split(':')
-    #             pprint (bits)
-    #             feed_parts = { 'source': bits[0], 'term': bits[1] }
-    #             fd.append(feed_parts)
-    #         return fd
-    #     
-    #     def filter_data(self):
-    #         fd = []
-    #         filters = self.filters.split("\n")
-    #         for f in filters:
-    #             fd.append(f)
-    #         return fd
 
     class Meta:
         app_label = 'typepadapp'

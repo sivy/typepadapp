@@ -67,7 +67,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     filters_list.short_description = 'Filters'
 
     def save_model(self, request, obj, form, change):
-        log.info('handle changed subscription')
+        log.info('handle create/change subscription')
         if (change):
             log.debug('WILL: update subscription in typepad')
         else:
@@ -99,6 +99,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
         token = oauth.OAuthToken(settings.OAUTH_GENERAL_PURPOSE_KEY, settings.OAUTH_GENERAL_PURPOSE_SECRET)
         backend = urlparse(typepad.client.endpoint)
+        log.info(typepad.client.endpoint)
         typepad.client.add_credentials(consumer, token, domain=backend[1])
         
         # collect data for sync to typepad
@@ -125,7 +126,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
             try:
                 callback_path = reverse('typepadapp.views.feedsub.callback', kwargs={'sub_id': str(obj.id)})
                 callback_url = urlunsplit(('http', domain, callback_path, '', ''))
-
+                
+                log.debug(callback_url)
+                
                 application = typepad.Application.get_by_id(settings.APPLICATION_ID)
                 resp = application.create_external_feed_subscription(
                     callback_url=callback_url,
@@ -135,6 +138,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                     verify_token=verify_token)
             except Exception, exc:
                 resp = None
+                messages.add_message(request, messages.ERROR, exc)
                 log.exception(exc)
 
             if resp:
@@ -143,7 +147,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 s = Subscription.objects.get(verify_token=verify_token)
                 s.url_id = resp.subscription.url_id
                 s.save()
-                logging.getLogger(__name__).info("Created subscription %s." % s.url_id)
+                logging.getLogger(__name__).info("Created subscription %s (%s)." % (s.name, s.url_id))
+                messages.add_message(request, messages.INFO, "Created remote subscription %s (%s)" % (s.name, s.url_id))
             else:
                 obj.delete()
                 logging.getLogger(__name__).warning("Subscription failed.")
