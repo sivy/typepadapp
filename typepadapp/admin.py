@@ -87,6 +87,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         except AttributeError:
             typepad.client.endpoint = 'https://api.typepad.com'
 
+        log.debug('just set client endpoint: ' + typepad.client.endpoint)
         ###
         # apply any TYPEPAD_COOKIES declared
         try:
