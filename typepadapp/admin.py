@@ -73,8 +73,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
         else:
             log.debug('WILL: create subscription in typepad')
         
-        obj.save()
-        log.debug("saved %s (%s)" % (obj.name, obj.id))
         
         ###
         # setup for pushing to typepad
@@ -118,9 +116,15 @@ class SubscriptionAdmin(admin.ModelAdmin):
             raise Exception("Your Django 'sites' have not been configured")
         
         secret = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
+        obj.secret = secret
         
         # generate a verification token
         verify_token = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
+        obj.verify_token = verify_token
+        
+        obj.save()
+        log.debug("saved %s (%s)" % (obj.name, obj.id))
+        
         
         if (not change):
             # new object
