@@ -28,6 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from django.contrib import admin
+from django.contrib import messages
 
 from typepadapp.models.auth import Token
 from typepadapp.models.feedsub import Subscription
@@ -78,7 +79,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         for setting in ('OAUTH_CONSUMER_KEY', 'OAUTH_CONSUMER_SECRET', 'OAUTH_GENERAL_PURPOSE_KEY',
                         'OAUTH_GENERAL_PURPOSE_SECRET'):
             if not hasattr(settings, setting):
-                raise CommandError("%s setting is required" % setting)
+                raise Exception("%s setting is required" % setting)
         ###
         # setup endpoint
         try:
@@ -104,14 +105,14 @@ class SubscriptionAdmin(admin.ModelAdmin):
         feed_idents = obj.feeds.split("\n")
         
         if len(feed_idents) == 0:
-            raise CommandError("At least one feed URL parameter is required")
+            raise Exception("At least one feed URL parameter is required")
         
         filters = str(obj.filters).split("\n") or []
 
         current_site = Site.objects.get_current()
         domain = current_site.domain
         if domain == 'example.com':
-            raise CommandError("Your Django 'sites' have not been configured")
+            raise Exception("Your Django 'sites' have not been configured")
         
         secret = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
         
