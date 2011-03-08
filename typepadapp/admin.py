@@ -74,6 +74,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
             log.debug('WILL: create subscription in typepad')
         
         obj.save()
+        log.debug("saved %s (%s)" % (obj.name, obj.id))
+        
         ###
         # setup for pushing to typepad
         for setting in ('OAUTH_CONSUMER_KEY', 'OAUTH_CONSUMER_SECRET', 'OAUTH_GENERAL_PURPOSE_KEY',
@@ -87,7 +89,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
         except AttributeError:
             typepad.client.endpoint = 'https://api.typepad.com'
 
-        log.debug('just set client endpoint: ' + typepad.client.endpoint)
         ###
         # apply any TYPEPAD_COOKIES declared
         try:
@@ -100,9 +101,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
         consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
         token = oauth.OAuthToken(settings.OAUTH_GENERAL_PURPOSE_KEY, settings.OAUTH_GENERAL_PURPOSE_SECRET)
         backend = urlparse(typepad.client.endpoint)
-
-        log.info('typepad client: %s' % typepad.__file__)
-        log.info('client endpoint: %s' % typepad.client.endpoint)
 
         typepad.client.add_credentials(consumer, token, domain=backend[1])
         
@@ -131,12 +129,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 callback_path = reverse('typepadapp.views.feedsub.callback', kwargs={'sub_id': str(obj.id)})
                 callback_url = urlunsplit(('http', domain, callback_path, '', ''))
                 
-                log.debug(callback_url)
-                
-                log.debug('save_model endpoint: %s' % typepad.client.endpoint)
-                typepad.client.batch_request()
                 application = typepad.Application.get_by_id(settings.APPLICATION_ID)
-                typepad.client.complete_batch()
                 
                 resp = application.create_external_feed_subscription(
                     callback_url=callback_url,
@@ -160,6 +153,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
             else:
                 obj.delete()
                 logging.getLogger(__name__).warning("Subscription failed.")
+                messages.add_message(request, messages.ERROR, "Subscription failed!")
     
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
