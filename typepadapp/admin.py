@@ -155,9 +155,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 logging.getLogger(__name__).info("Created subscription %s (%s)." % (s.name, s.url_id))
                 messages.add_message(request, messages.INFO, "Created remote subscription %s (%s)" % (s.name, s.url_id))
             else:
-                obj.delete()
-                logging.getLogger(__name__).warning("Subscription failed.")
+                # obj.delete()
                 messages.add_message(request, messages.ERROR, "Subscription failed!")
+                logging.getLogger(__name__).warning("Subscription failed.")
     
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
