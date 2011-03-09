@@ -123,7 +123,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
         obj.verify_token = verify_token
         
         obj.save()
-        log.debug("saved %s (%s)" % (obj.name, obj.id))
+        
+        log.debug("saved %s (%s): %s" % (obj.name, obj.id, pprint(obj)))
         
         
         if (not change):
