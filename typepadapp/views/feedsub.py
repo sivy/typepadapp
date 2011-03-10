@@ -188,6 +188,9 @@ def subscribe(request, sub_id):
     try:
         sub = Subscription.objects.get(verify_token=verify_token)
         log.debug(sub)
+        log.debug(sub.id)
+        log.debug(int(sub_id))
+        
         assert(sub.id == int(sub_id))
     except Subscription.DoesNotExist:
         return HttpResponseNotFound("Not expecting a subscription with verification token %r" % verify_token,
