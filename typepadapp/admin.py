@@ -45,7 +45,7 @@ from oauth import oauth
 
 import typepad
 
-from pprint import pprint
+from pprint import pprint as pp
 
 import logging
 log = logging.getLogger(__name__)
@@ -57,6 +57,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     model = Subscription
     list_display = ('name', 'feeds_list', 'filters_list','url_id', 'verified')
     readonly_fields = ('secret',)
+    search_fields = ['name','feeds_list','filters_list','verify_token']
 
     def feeds_list(self, obj):
         return ', '.join(obj.feeds.split('\n'))
@@ -124,8 +125,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         
         obj.save()
         
-        log.debug("saved %s (%s): %s" % (obj.name, obj.id, pprint(obj)))
-        
+        log.debug("saved %s (%s): %s" % (obj.name, obj.id, repr(obj)))
         
         if (not change):
             # new object
@@ -159,7 +159,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 # obj.delete()
                 messages.add_message(request, messages.ERROR, "Subscription failed!")
                 logging.getLogger(__name__).warning("Subscription failed.")
-    
+
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
 
