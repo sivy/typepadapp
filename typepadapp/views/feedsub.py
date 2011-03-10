@@ -40,7 +40,7 @@ except ImportError:
     from elementtree import ElementTree
 
 from django.contrib.csrf.middleware import csrf_exempt
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from iso8601 import iso8601
 import simplejson as json
 
@@ -183,8 +183,11 @@ def subscribe(request, sub_id):
     challenge = request.GET['hub.challenge']
     verify_token = request.GET['hub.verify_token']
 
+    log.debug('subscribe request from typepad')
+
     try:
         sub = Subscription.objects.get(verify_token=verify_token)
+        log.debug(sub)
         assert(sub.id == int(sub_id))
     except Subscription.DoesNotExist:
         return HttpResponseNotFound("Not expecting a subscription with verification token %r" % verify_token,
