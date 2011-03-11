@@ -170,11 +170,11 @@ def delete_subscription(**kwargs):
     log.info('WILL: delete subscription')
 
     obj=kwargs['instance']
+    url_id = obj.url_id
     
     init_typepad()
     
-    
-    if (obj.url_id):
+    if (url_id):
         ###
         # Setup for OAuth authentication
         consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
@@ -182,14 +182,17 @@ def delete_subscription(**kwargs):
         backend = urlparse(typepad.client.endpoint)
 
         typepad.client.add_credentials(consumer, token, domain=backend[1])
-    
-        typepad.client.batch_request()
-        subscription = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id)
-        subscription.delete()
-        typepad.client.complete_batch()
+        
+        
+        try:
+            typepad.client.batch_request()
+            subscription = typepad.ExternalFeedSubscription.get_by_url_id(url_id).delete()
+            typepad.client.complete_batch()
 
-        messages.add_message(request, messages.INFO, "Subscription deleted from Typepad")
-
+            messages.add_message(request, messages.INFO, "Subscription deleted from Typepad")
+        except NotFound:
+            messages.add_message(request, messages.ERROR, "Could not fund subscription with ID: %s" % url_id)
+            
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
 
