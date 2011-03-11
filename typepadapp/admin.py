@@ -60,7 +60,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     readonly_fields = ('secret',)
     search_fields = ['name','feeds','filters','verify_token']
     
-    def __init__(model, self):
+    def init_typepad(self):
         ###
         # setup for pushing to typepad
         for setting in ('OAUTH_CONSUMER_KEY', 'OAUTH_CONSUMER_SECRET', 'OAUTH_GENERAL_PURPOSE_KEY',
@@ -97,6 +97,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
             log.debug('WILL: update subscription in typepad')
         else:
             log.debug('WILL: create subscription in typepad')
+        
+        init_typepad()
         
         ###
         # Setup for OAuth authentication
@@ -165,6 +167,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     def delete_model(self, request, obj):
         log.info('WILL: delete subscription')
+        
+        init_typepad()
         
         ###
         # Setup for OAuth authentication
