@@ -124,15 +124,15 @@ class SubscriptionAdmin(admin.ModelAdmin):
         obj.verify_token = verify_token
         
         obj.save()
+        log.debug("saved %s (%s): %s" % (obj.name, obj.id, repr(obj)))
         
+        log.debug("Current no. of subscriptions post obj save: " % Subscription.objects.count())
         try:
             s = Subscription.objects.get(verify_token=verify_token)
             log.debug("======\nsub for verify_token %s: %s" % (verify_token, repr(s)))
         except Subscription.DoesNotExist:
             log.error("======\nCould not load subscription for verify_token: %s" % verify_token)
-        
-        log.debug("saved %s (%s): %s" % (obj.name, obj.id, repr(obj)))
-        
+                
         if (not change):
             # new object
             # save to typepad
