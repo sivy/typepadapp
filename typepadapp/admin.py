@@ -53,35 +53,35 @@ log = logging.getLogger(__name__)
 
 from django.contrib.sites.models import Site
 
+def init_typepad():
+    ###
+    # setup for pushing to typepad
+    for setting in ('OAUTH_CONSUMER_KEY', 'OAUTH_CONSUMER_SECRET', 'OAUTH_GENERAL_PURPOSE_KEY',
+                    'OAUTH_GENERAL_PURPOSE_SECRET'):
+        if not hasattr(settings, setting):
+            raise Exception("Cannot initialize connection to Typepad: %s setting is required" % setting)
+    
+    ###
+    # setup endpoint
+    try:
+        typepad.client.endpoint = settings.BACKEND_URL
+    except AttributeError:
+        typepad.client.endpoint = 'https://api.typepad.com'
+
+    ###
+    # apply any TYPEPAD_COOKIES declared
+    try:
+        typepad.client.cookies.update(settings.TYPEPAD_COOKIES)
+    except AttributeError:
+        pass
+
+
 class SubscriptionAdmin(admin.ModelAdmin):
 
     model = Subscription
     list_display = ('name', 'feeds_list', 'filters_list','url_id', 'verified')
     readonly_fields = ('secret',)
-    search_fields = ['name','feeds','filters','verify_token']
-    
-    def init_typepad(self):
-        ###
-        # setup for pushing to typepad
-        for setting in ('OAUTH_CONSUMER_KEY', 'OAUTH_CONSUMER_SECRET', 'OAUTH_GENERAL_PURPOSE_KEY',
-                        'OAUTH_GENERAL_PURPOSE_SECRET'):
-            if not hasattr(settings, setting):
-                raise Exception("Cannot initialize connection to Typepad: %s setting is required" % setting)
-        
-        ###
-        # setup endpoint
-        try:
-            typepad.client.endpoint = settings.BACKEND_URL
-        except AttributeError:
-            typepad.client.endpoint = 'https://api.typepad.com'
-
-        ###
-        # apply any TYPEPAD_COOKIES declared
-        try:
-            typepad.client.cookies.update(settings.TYPEPAD_COOKIES)
-        except AttributeError:
-            pass
-        
+    search_fields = ['name','feeds','filters','verify_token']        
     
     def feeds_list(self, obj):
         return ', '.join(obj.feeds.split('\n'))
