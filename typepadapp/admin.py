@@ -182,17 +182,8 @@ def delete_subscription(sender, obj):
     typepad.client.batch_request()
     subscription = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id).delete()
     typepad.client.complete_batch()
+    messages.add_message(request, messages.INFO, "Subscription deleted from Typepad")
 
-    from typepadapp.models.feedsub import Subscription
-    try:
-        s = Subscription.objects.get(url_id=obj.url_id)
-        msg = "Subscription %s was successfully deleted" % obj.name
-        messages.add_message(request, messages.INFO, )
-        s.delete()
-        
-    except Subscription.DoesNotExist:
-        pass
-    
 
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
