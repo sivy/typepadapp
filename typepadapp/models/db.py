@@ -109,7 +109,16 @@ class Subscription(models.Model):
         return self.name or self.url_id
 
     def __repr__(self):
-        return json.dumps(self)
+        return {
+            "id":self.id,
+            "name":self.name,
+            "url_id":self.url_id,
+            "feeds":self.feeds,
+            "filters":self.filters,
+            "secret":self.secret,
+            "verified":self.verified,
+            "verify_token":self.verify_token
+        }
         
 
     class Meta:
