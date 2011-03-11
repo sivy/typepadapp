@@ -126,7 +126,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         obj.save()
         log.debug("saved %s (%s): %s" % (obj.name, obj.id, repr(obj)))
         
-        log.debug("Current no. of subscriptions post obj save: " % Subscription.objects.count())
+        log.debug("Current no. of subscriptions post obj save: %s" % Subscription.objects.count())
         try:
             s = Subscription.objects.get(verify_token=verify_token)
             log.debug("======\nsub for verify_token %s: %s" % (verify_token, repr(s)))
