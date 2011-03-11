@@ -165,38 +165,40 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 messages.add_message(request, messages.ERROR, "Subscription failed!")
                 logging.getLogger(__name__).warning("Subscription failed.")
 
-    def delete_model(self, request, obj):
-        log.info('WILL: delete subscription')
-        
-        init_typepad()
-        
-        ###
-        # Setup for OAuth authentication
-        consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
-        token = oauth.OAuthToken(settings.OAUTH_GENERAL_PURPOSE_KEY, settings.OAUTH_GENERAL_PURPOSE_SECRET)
-        backend = urlparse(typepad.client.endpoint)
-
-        typepad.client.add_credentials(consumer, token, domain=backend[1])
-        
-        typepad.client.batch_request()
-        subscription = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id).delete()
-        typepad.client.complete_batch()
-
-        from typepadapp.models.feedsub import Subscription
-        try:
-            s = Subscription.objects.get(url_id=obj.url_id)
-            msg = "Subscription %s was successfully deleted" % obj.name
-            messages.add_message(request, messages.INFO, )
-            s.delete()
-            
-        except Subscription.DoesNotExist:
-            pass
+# django.db.models.signals.pre_delete
+def delete_subscription(sender, obj):
+    log.info('WILL: delete subscription')
     
-            
+    init_typepad()
+    
+    ###
+    # Setup for OAuth authentication
+    consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
+    token = oauth.OAuthToken(settings.OAUTH_GENERAL_PURPOSE_KEY, settings.OAUTH_GENERAL_PURPOSE_SECRET)
+    backend = urlparse(typepad.client.endpoint)
+
+    typepad.client.add_credentials(consumer, token, domain=backend[1])
+    
+    typepad.client.batch_request()
+    subscription = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id).delete()
+    typepad.client.complete_batch()
+
+    from typepadapp.models.feedsub import Subscription
+    try:
+        s = Subscription.objects.get(url_id=obj.url_id)
+        msg = "Subscription %s was successfully deleted" % obj.name
+        messages.add_message(request, messages.INFO, )
+        s.delete()
         
+    except Subscription.DoesNotExist:
+        pass
+    
 
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
+
+from django.db.models.signals import pre_delete
+pre_delete.connect(delete_subscription, sender=Subscription)
 
 try:
     from typepadapp.models.auth import UserForTypePadUser
