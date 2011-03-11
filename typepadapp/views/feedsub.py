@@ -184,7 +184,7 @@ def subscribe(request, sub_id):
     verify_token = request.GET['hub.verify_token']
 
     log.debug('subscribe request from typepad - challenge: %s verify_token: %s' % (challenge, verify_token))
-    log.debug("Current no. of subscriptions in subscribe: " % Subscription.objects.count())
+    log.debug("Current no. of subscriptions in subscribe: %s" % Subscription.objects.count())
 
     try:
         sub = Subscription.objects.get(verify_token=verify_token)
