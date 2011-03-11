@@ -60,7 +60,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     readonly_fields = ('secret',)
     search_fields = ['name','feeds','filters','verify_token']
     
-    def __init__(self):
+    def __init__(model, self):
         ###
         # setup for pushing to typepad
         for setting in ('OAUTH_CONSUMER_KEY', 'OAUTH_CONSUMER_SECRET', 'OAUTH_GENERAL_PURPOSE_KEY',
