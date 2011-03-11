@@ -183,12 +183,8 @@ def subscribe(request, sub_id):
     challenge = request.GET['hub.challenge']
     verify_token = request.GET['hub.verify_token']
 
-    log.debug('subscribe request from typepad - challenge: %s verify_token: %s' % (challenge, verify_token))
-    log.debug("Current no. of subscriptions in subscribe: %s" % Subscription.objects.count())
-
     try:
-        sub = Subscription.objects.get(verify_token=verify_token)
-        
+        sub = Subscription.objects.get(verify_token=verify_token)    
         assert(sub.id == int(sub_id))
     except Subscription.DoesNotExist:
         return HttpResponseNotFound("Not expecting a subscription with verification token %r" % verify_token,
