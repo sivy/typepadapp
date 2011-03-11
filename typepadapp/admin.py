@@ -172,20 +172,20 @@ def delete_subscription(obj, **kwargs):
     init_typepad()
     
     if (obj.url_id):
-    ###
-    # Setup for OAuth authentication
-    consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
-    token = oauth.OAuthToken(settings.OAUTH_GENERAL_PURPOSE_KEY, settings.OAUTH_GENERAL_PURPOSE_SECRET)
-    backend = urlparse(typepad.client.endpoint)
+        ###
+        # Setup for OAuth authentication
+        consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
+        token = oauth.OAuthToken(settings.OAUTH_GENERAL_PURPOSE_KEY, settings.OAUTH_GENERAL_PURPOSE_SECRET)
+        backend = urlparse(typepad.client.endpoint)
 
-    typepad.client.add_credentials(consumer, token, domain=backend[1])
+        typepad.client.add_credentials(consumer, token, domain=backend[1])
     
-    typepad.client.batch_request()
-    subscription = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id)
-    subscription.delete()
-    typepad.client.complete_batch()
+        typepad.client.batch_request()
+        subscription = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id)
+        subscription.delete()
+        typepad.client.complete_batch()
 
-    messages.add_message(request, messages.INFO, "Subscription deleted from Typepad")
+        messages.add_message(request, messages.INFO, "Subscription deleted from Typepad")
 
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
