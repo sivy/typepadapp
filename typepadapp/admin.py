@@ -141,7 +141,16 @@ class SubscriptionAdmin(admin.ModelAdmin):
         log.debug("Current no. of subscriptions post obj save: %s" % Subscription.objects.count())
         try:
             s = Subscription.objects.get(verify_token=verify_token)
-            log.debug("======\nsub for verify_token %s: %s" % (verify_token, pp(s)))
+            log.debug("======\nsub for verify_token %s: %s" % (verify_token, repr({
+                "id":s.id,
+                "name":s.name,
+                "url_id":s.url_id,
+                "feeds":s.feeds,
+                "filters":s.filters,
+                "secret":s.secret,
+                "verified":s.verified,
+                "verify_token":s.verify_token
+            })))
         except Subscription.DoesNotExist:
             log.error("======\nCould not load subscription for verify_token: %s" % verify_token)
                 
