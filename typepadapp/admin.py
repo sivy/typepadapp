@@ -180,8 +180,10 @@ def delete_subscription(sender, obj):
     typepad.client.add_credentials(consumer, token, domain=backend[1])
     
     typepad.client.batch_request()
-    subscription = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id).delete()
+    subscription = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id)
+    subscription.delete()
     typepad.client.complete_batch()
+
     messages.add_message(request, messages.INFO, "Subscription deleted from Typepad")
 
 
