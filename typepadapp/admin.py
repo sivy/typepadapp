@@ -59,7 +59,30 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('name', 'feeds_list', 'filters_list','url_id', 'verified')
     readonly_fields = ('secret',)
     search_fields = ['name','feeds','filters','verify_token']
+    
+    def __init__(self):
+        ###
+        # setup for pushing to typepad
+        for setting in ('OAUTH_CONSUMER_KEY', 'OAUTH_CONSUMER_SECRET', 'OAUTH_GENERAL_PURPOSE_KEY',
+                        'OAUTH_GENERAL_PURPOSE_SECRET'):
+            if not hasattr(settings, setting):
+                raise Exception("Cannot initialize connection to Typepad: %s setting is required" % setting)
+        
+        ###
+        # setup endpoint
+        try:
+            typepad.client.endpoint = settings.BACKEND_URL
+        except AttributeError:
+            typepad.client.endpoint = 'https://api.typepad.com'
 
+        ###
+        # apply any TYPEPAD_COOKIES declared
+        try:
+            typepad.client.cookies.update(settings.TYPEPAD_COOKIES)
+        except AttributeError:
+            pass
+        
+    
     def feeds_list(self, obj):
         return ', '.join(obj.feeds.split('\n'))
     feeds_list.short_description = 'Feeds'
@@ -75,27 +98,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
         else:
             log.debug('WILL: create subscription in typepad')
         
-        
-        ###
-        # setup for pushing to typepad
-        for setting in ('OAUTH_CONSUMER_KEY', 'OAUTH_CONSUMER_SECRET', 'OAUTH_GENERAL_PURPOSE_KEY',
-                        'OAUTH_GENERAL_PURPOSE_SECRET'):
-            if not hasattr(settings, setting):
-                raise Exception("%s setting is required" % setting)
-        ###
-        # setup endpoint
-        try:
-            typepad.client.endpoint = settings.BACKEND_URL
-        except AttributeError:
-            typepad.client.endpoint = 'https://api.typepad.com'
-
-        ###
-        # apply any TYPEPAD_COOKIES declared
-        try:
-            typepad.client.cookies.update(settings.TYPEPAD_COOKIES)
-        except AttributeError:
-            pass
-
         ###
         # Setup for OAuth authentication
         consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
@@ -160,6 +162,34 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 # obj.delete()
                 messages.add_message(request, messages.ERROR, "Subscription failed!")
                 logging.getLogger(__name__).warning("Subscription failed.")
+
+    def delete_model(self, request, obj):
+        log.info('WILL: delete subscription')
+        
+        ###
+        # Setup for OAuth authentication
+        consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
+        token = oauth.OAuthToken(settings.OAUTH_GENERAL_PURPOSE_KEY, settings.OAUTH_GENERAL_PURPOSE_SECRET)
+        backend = urlparse(typepad.client.endpoint)
+
+        typepad.client.add_credentials(consumer, token, domain=backend[1])
+        
+        typepad.client.batch_request()
+        subscription = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id).delete()
+        typepad.client.complete_batch()
+
+        from typepadapp.models.feedsub import Subscription
+        try:
+            s = Subscription.objects.get(url_id=obj.url_id)
+            msg = "Subscription %s was successfully deleted" % obj.name
+            messages.add_message(request, messages.INFO, )
+            s.delete()
+            
+        except Subscription.DoesNotExist:
+            pass
+    
+            
+        
 
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
