@@ -127,7 +127,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         from pprint import pprint as pp
         obj.save()
         transaction.commit()
-        log.debug("saved %s (%s): %s" % (obj.name, obj.id, {
+        log.debug("saved %s (%s): %s" % (obj.name, obj.id, repr({
             "id":obj.id,
             "name":obj.name,
             "url_id":obj.url_id,
@@ -136,7 +136,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
             "secret":obj.secret,
             "verified":obj.verified,
             "verify_token":obj.verify_token
-        }))
+        })))
         
         log.debug("Current no. of subscriptions post obj save: %s" % Subscription.objects.count())
         try:
