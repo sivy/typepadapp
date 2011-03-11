@@ -41,6 +41,7 @@ from oauth import oauth
 import typepad
 
 from pprint import pprint
+import simplejson as json
 
 import logging
 log = logging.getLogger(__name__)
@@ -106,6 +107,10 @@ class Subscription(models.Model):
 
     def __unicode__(self):
         return self.name or self.url_id
+
+    def __repr__(self):
+        return json.dumps(self)
+        
 
     class Meta:
         app_label = 'typepadapp'
