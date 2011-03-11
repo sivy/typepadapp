@@ -166,7 +166,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 logging.getLogger(__name__).warning("Subscription failed.")
 
 # django.db.models.signals.pre_delete
-def delete_subscription(obj, **kwargs):
+def delete_subscription(*args, **kwargs):
     log.info('WILL: delete subscription')
     
     init_typepad()
