@@ -29,6 +29,7 @@
 
 from django.contrib import admin
 from django.contrib import messages
+from django.db import transaction
 
 from typepadapp.models.auth import Token
 from typepadapp.models.feedsub import Subscription
@@ -125,7 +126,17 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
         from pprint import pprint as pp
         obj.save()
-        log.debug("saved %s (%s): %s" % (obj.name, obj.id, repr(obj)))
+        transaction.commit()
+        log.debug("saved %s (%s): %s" % (obj.name, obj.id, {
+            "id":obj.id,
+            "name":obj.name,
+            "url_id":obj.url_id,
+            "feeds":obj.feeds,
+            "filters":obj.filters,
+            "secret":obj.secret,
+            "verified":obj.verified,
+            "verify_token":obj.verify_token
+        }))
         
         log.debug("Current no. of subscriptions post obj save: %s" % Subscription.objects.count())
         try:
