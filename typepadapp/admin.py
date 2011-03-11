@@ -125,6 +125,12 @@ class SubscriptionAdmin(admin.ModelAdmin):
         
         obj.save()
         
+        try:
+            s = Subscription.objects.get(verify_token=verify_token)
+            log.debug(s)
+        except Subscription.DoesNotExist:
+            log.error("Could not load subscription for verify_token: %s" % verify_token)
+        
         log.debug("saved %s (%s): %s" % (obj.name, obj.id, repr(obj)))
         
         if (not change):
