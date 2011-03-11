@@ -123,9 +123,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
         verify_token = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
         obj.verify_token = verify_token
 
-        from pprint import pprint as pp        
+        from pprint import pprint as pp
         obj.save()
-        log.debug("saved %s (%s): %s" % (obj.name, obj.id, pp(obj)))
+        log.debug("saved %s (%s): %s" % (obj.name, obj.id, repr(obj)))
         
         log.debug("Current no. of subscriptions post obj save: %s" % Subscription.objects.count())
         try:
