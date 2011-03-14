@@ -189,7 +189,7 @@ def delete_subscription(**kwargs):
             subscription = typepad.ExternalFeedSubscription.get_by_url_id(url_id).delete()
             log.info("Subscription deleted from Typepad")
         except typepad.ExternalFeedSubscription.NotFound:
-            log.error("Could not fund subscription with ID: %s" % url_id)
+            log.error("Could not find subscription with URL_ID: %s to delete" % url_id)
         typepad.client.complete_batch()
             
 admin.site.register(Subscription, SubscriptionAdmin)
