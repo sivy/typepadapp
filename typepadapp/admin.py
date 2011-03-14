@@ -184,14 +184,13 @@ def delete_subscription(**kwargs):
         typepad.client.add_credentials(consumer, token, domain=backend[1])
         
         
+        typepad.client.batch_request()
         try:
-            typepad.client.batch_request()
             subscription = typepad.ExternalFeedSubscription.get_by_url_id(url_id).delete()
-            typepad.client.complete_batch()
-
             log.info("Subscription deleted from Typepad")
         except typepad.ExternalFeedSubscription.NotFound:
             log.error("Could not fund subscription with ID: %s" % url_id)
+        typepad.client.complete_batch()
             
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
