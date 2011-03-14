@@ -173,7 +173,7 @@ def receive(request, sub_id):
         # handle json formatted content
         data = json.loads(payload)
         items = data['items']
-    log.debug("calling feedsub_content with %d items" % length(items))
+    log.debug("calling feedsub_content with %s items" % length(items))
     signals.feedsub_content.send(subscription=subscription, items=items, sender=receive)
     return HttpResponse('', status=200, content_type='text/plain')
 
