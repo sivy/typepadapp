@@ -163,12 +163,14 @@ def receive(request, sub_id):
                         if link_el.get('rel', 'alternate') == 'alternate' and link_el.get('type', 'text/html') == 'text/html':
                             entry['source_url'] = link_el.get('href')
                             break
-
+                
+                log.debug('got entry %r' % entry)
                 items.append(entry)
 
             except Exception, exc:
                 log.exception(exc)  # but continue
-
+        log.debug('got %s items' % len(items))
+        
     elif is_json:
         # handle json formatted content
         data = json.loads(payload)
