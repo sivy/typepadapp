@@ -89,6 +89,7 @@ def receive(request, sub_id):
             log.debug('Received signature header %r and expecting %r', signature, expected)
 
             if signature != expected:
+                log.debug('Incorrect signature for this payload')
                 return HttpResponseForbidden('Incorrect signature for this payload', content_type='text/plain')
         except Exception, exc:
             log.exception(exc)
