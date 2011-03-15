@@ -47,10 +47,8 @@ import simplejson as json
 from typepadapp.models.feedsub import Subscription
 from typepadapp import signals
 
-
 log = logging.getLogger(__name__)
 """A `logging` logger for sharing debug and status messages."""
-
 
 @csrf_exempt
 def callback(request, *args, **kwargs):
@@ -94,7 +92,8 @@ def receive(request, sub_id):
         except Exception, exc:
             log.exception(exc)
             raise
-
+    
+    log.debug(payload)
     # TBD: change this switch to something based on content-type once
     # TypePad identifies a content-type of json versus xml
     is_atom = re.match('\s*<', payload) is not None
@@ -174,6 +173,7 @@ def receive(request, sub_id):
         # handle json formatted content
         data = json.loads(payload)
         items = data['items']
+    
     log.debug("calling feedsub_content with %s items" % length(items))
     signals.feedsub_content.send(subscription=subscription, items=items, sender=receive)
     return HttpResponse('', status=200, content_type='text/plain')
