@@ -146,7 +146,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 resp = application.create_external_feed_subscription(
                     callback_url=callback_url,
                     feed_idents=feed_idents,
-                    filter_rules=filters,
+                    filter_rules=filter_list,
                     secret=secret,
                     verify_token=verify_token)
             except Exception, exc:
