@@ -128,7 +128,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
         verify_token = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
         obj.verify_token = verify_token
 
-        from pprint import pprint as pp
         obj.save()
         transaction.commit()
                 
@@ -164,6 +163,42 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 # obj.delete()
                 messages.add_message(request, messages.ERROR, "Subscription failed!")
                 logging.getLogger(__name__).warning("Subscription failed.")
+        else:
+            try:
+                typepad.client.batch_request()
+                sub = typepad.ExternalFeedSubscription.get_by_url_id(obj.id)
+                typepad.client.complete_batch()
+
+                callback_path = reverse('typepadapp.views.feedsub.callback', kwargs={'sub_id': str(obj.id)})
+                callback_url = urlunsplit(('http', domain, callback_path, '', ''))
+
+                verify_token = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
+                obj.verify_token = verify_token
+                obj.verified = False
+                obj.save()
+
+                sub.
+                update_notification_settings(callback_url=callback_url, verify_token=verify_token)
+                print "Assigned new callback URL: %s" % callback_url
+                
+            except Exception, exc:
+                resp = None
+                messages.add_message(request, messages.ERROR, exc)
+                log.exception(exc)
+        
+           if resp:
+                # Meanwhile TypePad hit our callback, so reload the object to
+                # preserve the new "verified" value.
+                s = Subscription.objects.get(verify_token=verify_token)
+                s.url_id = resp.subscription.url_id
+                s.save()
+                logging.getLogger(__name__).info("Created subscription %s (%s)." % (s.name, s.url_id))
+                messages.add_message(request, messages.INFO, "Created remote subscription %s (%s)" % (s.name, s.url_id))
+            else:
+                # obj.delete()
+                messages.add_message(request, messages.ERROR, "Subscription failed!")
+                logging.getLogger(__name__).warning("Subscription failed.")
+            
 
 # django.db.models.signals.pre_delete
 def delete_subscription(**kwargs):
