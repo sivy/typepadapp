@@ -164,9 +164,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
             log.info('WILL: update subscription in typepad')
             
             # collect data for sync to typepad
-            orig_feeds = set(str(orig_obj.feeds).split("\n"))
+            orig_feeds = set(str(orig_obj.feeds).rstrip().split("\n"))
             log.debug("orig feeds: %s" % orig_feeds)
-            new_feeds = set(str(obj.feeds).split("\n"))
+            new_feeds = set(str(obj.feeds).rstrip().split("\n"))
             log.debug("new feeds: %s" % new_feeds)
             
             try:
@@ -181,20 +181,12 @@ class SubscriptionAdmin(admin.ModelAdmin):
                     log.info('Adding feeds: %s' % ",".join(list(add_feeds)))
                     sub.add_feeds(feed_idents=list(add_feeds))
                 
-                for feed in add_feeds:
-                    feed_list.add(feed)
-                    print "Added feed: %s" % feed
-
                 # in orig_feeds but not new_feeds -- remove it
                 remove_feeds = orig_feeds.difference(new_feeds)
                 if len(remove_feeds):
                     log.info('Removing feeds: %s' % ",".join(list(remove_feeds)))
                     sub.remove_feeds(feed_idents=list(remove_feeds))
                 
-                for feed in remove_feeds:
-                    feed_list.remove(feed)
-                    print "Removed feed: %s" % feed                   
-
                 # in new_filters but not in old_filters -- add it
                 if orig_obj.filters != obj.filters:
                     log.info('Updating filters: %s' % obj.filters)
