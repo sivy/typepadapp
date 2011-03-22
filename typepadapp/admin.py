@@ -80,8 +80,16 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     model = Subscription
     list_display = ('name', 'feeds_list', 'filters_list','url_id', 'verified')
-    readonly_fields = ('secret',)
-    search_fields = ['name','feeds','filters','verify_token']        
+    search_fields = ['name','feeds','filters','verify_token']
+    fieldsets = (
+            (None, {
+                'fields': ('name', 'feeds', 'filters')
+            }),
+            ('Advanced options', {
+                'classes': ('collapse',),
+                'fields': ('url_id', 'secret', 'verified', 'verify_token')
+            }),
+        )
     
     def feeds_list(self, obj):
         return ', '.join(obj.feeds.split('\n'))
