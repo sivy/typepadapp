@@ -164,8 +164,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
             orig_obj = Subscription.objects.get(id = obj.id)
 
             # collect data for sync to typepad
-            orig_feeds = set(str(orig_obj.feeds).split("\n"))            
+            orig_feeds = set(str(orig_obj.feeds).split("\n"))
+            log.debug("orig feeds: %s" % orig_feeds)
             new_feeds = set(str(obj.feeds).split("\n"))
+            log.debug("new feeds: %s" % new_feeds)
             
             try:
                 typepad.client.batch_request()
