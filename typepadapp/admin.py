@@ -181,23 +181,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 print "Assigned new callback URL: %s" % callback_url
                 
             except Exception, exc:
-                resp = None
                 messages.add_message(request, messages.ERROR, exc)
+                messages.add_message(request, messages.ERROR, "Subscription update failed!")
                 log.exception(exc)
-        
-            if resp:
-                # Meanwhile TypePad hit our callback, so reload the object to
-                # preserve the new "verified" value.
-                s = Subscription.objects.get(verify_token=verify_token)
-                s.url_id = resp.subscription.url_id
-                s.save()
-                log.info("Updated subscription %s (%s)." % (s.name, s.url_id))
-                messages.add_message(request, messages.INFO, "Created remote subscription %s (%s)" % (s.name, s.url_id))
-            else:
-                # obj.delete()
-                messages.add_message(request, messages.ERROR, "Subscription failed!")
-                logging.getLogger(__name__).warning("Subscription failed.")
-            
+                logging.warning("Subscription failed.")            
 
 # django.db.models.signals.pre_delete
 def delete_subscription(**kwargs):
