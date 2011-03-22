@@ -111,9 +111,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         backend = urlparse(typepad.client.endpoint)
 
         typepad.client.add_credentials(consumer, token, domain=backend[1])
-        
-        orig_obj = Subscription.objects.get(id = obj.id)
-        
+                
         feed_idents = set(obj.feeds.split("\n"))
         if len(feed_idents) == 0:
             raise Exception("At least one feed URL parameter is required")
@@ -170,6 +168,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 logging.getLogger(__name__).warning("Subscription failed.")
         else:
             log.info('WILL: update subscription in typepad')
+            
+            orig_obj = Subscription.objects.get(id = obj.id)
             
             # collect data for sync to typepad
             orig_feeds = set(str(orig_obj.feeds).rstrip().split("\n"))
