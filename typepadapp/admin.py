@@ -123,8 +123,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
         if domain == 'example.com':
             raise Exception("Your Django 'sites' have not been configured")
         
-        secret = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
-        obj.secret = secret
+        secret=None
+        #secret = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
+        #obj.secret = secret
         
         # generate a verification token
         verify_token = ''.join(random.choice(ascii_letters+digits) for x in xrange(0,20))
