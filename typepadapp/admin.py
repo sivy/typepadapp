@@ -165,6 +165,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
             try:
                 typepad.client.batch_request()
                 sub = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id)
+                log.debug(sub)
                 typepad.client.complete_batch()
 
                 callback_path = reverse('typepadapp.views.feedsub.callback', kwargs={'sub_id': str(obj.id)})
@@ -183,7 +184,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 messages.add_message(request, messages.ERROR, exc)
                 log.exception(exc)
         
-           if resp:
+            if resp:
                 # Meanwhile TypePad hit our callback, so reload the object to
                 # preserve the new "verified" value.
                 s = Subscription.objects.get(verify_token=verify_token)
