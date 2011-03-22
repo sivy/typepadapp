@@ -93,10 +93,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         log.info('handle create/change subscription')
-        if (change):
-            log.debug('WILL: update subscription in typepad')
-        else:
-            log.debug('WILL: create subscription in typepad')
         
         init_typepad()
         
@@ -132,6 +128,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         transaction.commit()
                 
         if (not change):
+            log.info('WILL: create subscription in typepad')
             # new object
             # save to typepad
             try:
@@ -157,16 +154,17 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 s = Subscription.objects.get(verify_token=verify_token)
                 s.url_id = resp.subscription.url_id
                 s.save()
-                logging.getLogger(__name__).info("Created subscription %s (%s)." % (s.name, s.url_id))
+                log.info("Created subscription %s (%s)." % (s.name, s.url_id))
                 messages.add_message(request, messages.INFO, "Created remote subscription %s (%s)" % (s.name, s.url_id))
             else:
                 # obj.delete()
                 messages.add_message(request, messages.ERROR, "Subscription failed!")
                 logging.getLogger(__name__).warning("Subscription failed.")
         else:
+            log.info('WILL: update subscription in typepad')
             try:
                 typepad.client.batch_request()
-                sub = typepad.ExternalFeedSubscription.get_by_url_id(obj.id)
+                sub = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id)
                 typepad.client.complete_batch()
 
                 callback_path = reverse('typepadapp.views.feedsub.callback', kwargs={'sub_id': str(obj.id)})
@@ -177,8 +175,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 obj.verified = False
                 obj.save()
 
-                sub.
-                update_notification_settings(callback_url=callback_url, verify_token=verify_token)
+                sub.update_notification_settings(callback_url=callback_url, verify_token=verify_token)
                 print "Assigned new callback URL: %s" % callback_url
                 
             except Exception, exc:
@@ -192,7 +189,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 s = Subscription.objects.get(verify_token=verify_token)
                 s.url_id = resp.subscription.url_id
                 s.save()
-                logging.getLogger(__name__).info("Created subscription %s (%s)." % (s.name, s.url_id))
+                log.info("Updated subscription %s (%s)." % (s.name, s.url_id))
                 messages.add_message(request, messages.INFO, "Created remote subscription %s (%s)" % (s.name, s.url_id))
             else:
                 # obj.delete()
