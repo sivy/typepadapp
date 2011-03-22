@@ -57,8 +57,10 @@ def callback(request, *args, **kwargs):
 
     if mode is None:
         # No mode means it's feed content from TypePad.
+        log.info('process callback: receive')
         return receive(request, *args, **kwargs)
     elif mode == 'subscribe':
+        log.info('process callback: subscribe')
         return subscribe(request, *args, **kwargs)
 
     return HttpResponse('Unknown hub.mode %r' % mode, status=400, content_type='text/plain')
@@ -186,10 +188,13 @@ def subscribe(request, sub_id):
     challenge = request.GET['hub.challenge']
     verify_token = request.GET['hub.verify_token']
 
+    log.info('subscribe: verify_token: %s' % verify_token)
+
     try:
         sub = Subscription.objects.get(verify_token=verify_token)    
         assert(sub.id == int(sub_id))
     except Subscription.DoesNotExist:
+        log.error("Not expecting a subscription with verification token %r" % verify_token)
         return HttpResponseNotFound("Not expecting a subscription with verification token %r" % verify_token,
             content_type='text/plain')
 
