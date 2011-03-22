@@ -179,7 +179,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 add_feeds = new_feeds.difference(orig_feeds)
                 if len(add_feeds):
                     log.info('Adding feeds: %s' % ",".join(list(add_feeds)))
-                    sub.add_feeds(feed_idents="\n".join(list(add_feeds)))
+                    sub.add_feeds(feed_idents=list(add_feeds))
                 
                 for feed in add_feeds:
                     feed_list.add(feed)
@@ -189,7 +189,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 remove_feeds = orig_feeds.difference(new_feeds)
                 if len(remove_feeds):
                     log.info('Removing feeds: %s' % ",".join(list(remove_feeds)))
-                    sub.remove_feeds(feed_idents="\n".join(list(remove_feeds)))
+                    sub.remove_feeds(feed_idents=list(remove_feeds))
                 
                 for feed in remove_feeds:
                     feed_list.remove(feed)
