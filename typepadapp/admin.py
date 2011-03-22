@@ -175,6 +175,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 obj.verify_token = verify_token
                 obj.verified = False
                 obj.save()
+                transaction.commit()
 
                 sub.update_notification_settings(callback_url=callback_url, verify_token=verify_token)
                 print "Assigned new callback URL: %s" % callback_url
