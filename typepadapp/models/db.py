@@ -99,7 +99,7 @@ class Subscription(models.Model):
     feeds = models.TextField(
         help_text="""
 The feed identifiers associated with this subscription, one per line:<br />
-twitter:keyword, twitter:#hashtag, typepad:keyword
+twitter:follow:123456789, twitter:keyword1 keyword2, twitter:#hashtag, typepad:keyword
 """)
     filters = models.TextField(blank=True, help_text="""
 The filters associated with this subscription, one per line:<br/>
