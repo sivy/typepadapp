@@ -96,8 +96,15 @@ class Subscription(models.Model):
     """
     name = models.CharField(max_length=200)
     url_id = models.CharField(max_length=200, blank=True, verbose_name='URL ID')
-    feeds = models.TextField(help_text='The feed identifiers associated with this subscription, one per line')
-    filters = models.TextField(blank=True, help_text='The filters associated with this subscription, one per line')
+    feeds = models.TextField(
+        help_text="""
+The feed identifiers associated with this subscription, one per line:<br />
+twitter:keyword, twitter:#hashtag, typepad:keyword
+""")
+    filters = models.TextField(blank=True, help_text="""
+The filters associated with this subscription, one per line:<br/>
+#hashtag, keyword (will limit results to posts containing the filter)
+""")
     secret = models.CharField(max_length=200, blank=True)
     verified = models.BooleanField(help_text='Whether TypePad verified this subscription yet')
     verify_token = models.CharField(max_length=200, blank=True)
