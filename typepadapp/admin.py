@@ -95,7 +95,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         log.info('handle create/change subscription')
         
         init_typepad()
-        
+                
         ###
         # Setup for OAuth authentication
         consumer = oauth.OAuthConsumer(settings.OAUTH_CONSUMER_KEY, settings.OAUTH_CONSUMER_SECRET)
@@ -104,13 +104,11 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
         typepad.client.add_credentials(consumer, token, domain=backend[1])
         
-        # collect data for sync to typepad
-        feed_idents = obj.feeds.split("\n")
-        
+        feed_idents = set(obj.feeds.split("\n"))
         if len(feed_idents) == 0:
             raise Exception("At least one feed URL parameter is required")
         
-        filters = str(obj.filters).split("\n") or []
+        filter_list = str(obj.filters).split("\n") or []
 
         current_site = Site.objects.get_current()
         domain = current_site.domain
@@ -162,11 +160,43 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 logging.getLogger(__name__).warning("Subscription failed.")
         else:
             log.info('WILL: update subscription in typepad')
+            
+            orig_obj = Subscription.objects.get(id = obj.id)
+
+            # collect data for sync to typepad
+            orig_feeds = set(str(orig_obj.feeds).split("\n"))            
+            new_feeds = set(str(obj.feeds).split("\n"))
+            
             try:
                 typepad.client.batch_request()
                 sub = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id)
                 log.debug(sub)
                 typepad.client.complete_batch()
+                
+                # in new_feeds but not in old_feeds -- add it
+                add_feeds = new_feeds.difference(orig_feeds)
+                if len(add_feeds):
+                    log.info('Adding feeds: %s' % add_feeds.join(","))
+                    sub.add_feeds(feed_idents=add_feeds.join("\n"))
+                
+                for feed in add_feeds:
+                    feed_list.add(feed)
+                    print "Added feed: %s" % feed
+
+                # in orig_feeds but not new_feeds -- remove it
+                remove_feeds = orig_feeds.difference(new_feeds)
+                if len(remove_feeds):
+                    log.info('Removing feeds: %s' % remove_feeds.join(","))
+                    sub.remove_feeds(feed_idents=remove_feeds.join("\n"))
+                
+                for feed in remove_feeds:
+                    feed_list.remove(feed)
+                    print "Removed feed: %s" % feed                   
+
+                # in new_filters but not in old_filters -- add it
+                if orig_obj.filters != obj.filters:
+                    log.info('Updating filters: %s' % obj.filters)
+                    sub.update_filters(filter_rules=obj.filters)                
 
                 callback_path = reverse('typepadapp.views.feedsub.callback', kwargs={'sub_id': str(obj.id)})
                 callback_url = urlunsplit(('http', domain, callback_path, '', ''))
