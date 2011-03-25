@@ -108,7 +108,12 @@ The filters associated with this subscription, one per line:<br/>
     secret = models.CharField(max_length=200, blank=True)
     verified = models.BooleanField(help_text='Whether TypePad verified this subscription yet')
     verify_token = models.CharField(max_length=200, blank=True)
-
+    
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if ('"' in self.feeds or ',' in self.feeds):
+            raise ValidationError("Feeds cannot contain quotes (\") or commas.")
+    
     def __str__(self):
         return self.name or self.url_id
 
