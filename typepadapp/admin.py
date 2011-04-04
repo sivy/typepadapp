@@ -102,6 +102,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         log.info('handle create/change subscription')
         
+        orig_obj = Subscription.objects.get(id = obj.id)
+        orig_feeds = orig_obj.feeds
+        orig_filters = orig_obj.filters
+        
         init_typepad()
                 
         ###
@@ -169,12 +173,11 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 logging.getLogger(__name__).warning("Subscription failed.")
         else:
             log.info('WILL: update subscription in typepad')
-            
-            orig_obj = Subscription.objects.get(id = obj.id)
-            
+                        
             # collect data for sync to typepad
-            orig_feeds = set(str(orig_obj.feeds).rstrip().split("\n"))
+            orig_feeds = set(str(orig_feeds).rstrip().split("\n"))
             log.debug("orig feeds: %s" % orig_feeds)
+            
             new_feeds = set(str(obj.feeds).rstrip().split("\n"))
             log.debug("new feeds: %s" % new_feeds)
             
@@ -199,7 +202,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                     sub.remove_feeds(feed_idents=list(remove_feeds))
                 
                 # in new_filters but not in old_filters -- add it
-                if orig_obj.filters != obj.filters:
+                if orig_filters != obj.filters:
                     log.info('Updating filters: %s' % obj.filters)
                     sub.update_filters(filter_rules=obj.filters)                
 
