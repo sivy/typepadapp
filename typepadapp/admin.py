@@ -104,7 +104,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
         
         orig_obj = Subscription.objects.get(id = obj.id)
         orig_feeds = orig_obj.feeds
+        log.debug('orig_feeds: %s' % orig_feeds)
         orig_filters = orig_obj.filters
+        log.debug('orig_filters: %s' % orig_filters)
         
         init_typepad()
                 
@@ -173,14 +175,14 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 logging.getLogger(__name__).warning("Subscription failed.")
         else:
             log.info('WILL: update subscription in typepad')
-                        
+            
             # collect data for sync to typepad
             orig_feeds = set(str(orig_feeds).rstrip().split("\n"))
             log.debug("orig feeds: %s" % orig_feeds)
             
             new_feeds = set(str(obj.feeds).rstrip().split("\n"))
             log.debug("new feeds: %s" % new_feeds)
-            
+                        
             try:
                 typepad.client.batch_request()
                 sub = typepad.ExternalFeedSubscription.get_by_url_id(obj.url_id)
