@@ -102,11 +102,13 @@ class SubscriptionAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         log.info('handle create/change subscription')
         
-        orig_obj = Subscription.objects.get(id = obj.id)
-        orig_feeds = orig_obj.feeds
-        log.debug('orig_feeds: %s' % orig_feeds)
-        orig_filters = orig_obj.filters
-        log.debug('orig_filters: %s' % orig_filters)
+        
+        if change:
+            orig_obj = Subscription.objects.get(id = obj.id)
+            orig_feeds = orig_obj.feeds
+            log.debug('orig_feeds: %s' % orig_feeds)
+            orig_filters = orig_obj.filters
+            log.debug('orig_filters: %s' % orig_filters)
         
         init_typepad()
                 
@@ -244,7 +246,6 @@ def delete_subscription(**kwargs):
 
         typepad.client.add_credentials(consumer, token, domain=backend[1])
         
-        
         typepad.client.batch_request()
         try:
             subscription = typepad.ExternalFeedSubscription.get_by_url_id(url_id).delete()
@@ -257,7 +258,7 @@ admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Token)
 
 from django.db.models.signals import pre_delete
-pre_delete.connect(delete_subscription, sender=Subscription)
+#pre_delete.connect(delete_subscription, sender=Subscription)
 
 try:
     from typepadapp.models.auth import UserForTypePadUser
